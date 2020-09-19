@@ -111,7 +111,7 @@ async def async_unload_entry(hass: HomeAssistantType, entry: ConfigEntry) -> boo
     return unload_ok
 
 
-def _async_start_reauth(hass: HomeAssistant, entry: ConfigEntry):
+def _async_start_reauth(hass: HomeAssistantType, entry: ConfigEntry):
     hass.async_create_task(
         hass.config_entries.flow.async_init(
             DOMAIN,
