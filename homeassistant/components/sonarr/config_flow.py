@@ -129,8 +129,10 @@ class SonarrConfigFlow(ConfigFlow, domain=DOMAIN):
                             return self.async_abort(reason="reauth_successful")
 
                     return self.async_abort(reason="reauth_failure")
-     
-                return self.async_create_entry(title=user_input[CONF_HOST], data=user_input)
+
+                return self.async_create_entry(
+                    title=user_input[CONF_HOST], data=user_input
+                )
 
         data_schema = self._get_user_data_schema()
         return self.async_show_form(
