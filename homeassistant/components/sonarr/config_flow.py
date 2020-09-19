@@ -86,7 +86,7 @@ class SonarrConfigFlow(ConfigFlow, domain=DOMAIN):
         entry_id = self.context.get("reauth_entry_id")
 
         if not entry_id:
-            self.async_abort(reason="reauth_failure")
+            return self.async_abort(reason="reauth_failure")
 
         self._reauth = True
         self._entry_id = entry_id
