@@ -3,7 +3,7 @@ import asyncio
 from datetime import timedelta
 from typing import Any, Dict
 
-from sonarr import Sonarr, SonarrError
+from sonarr import Sonarr, SonarrAccessRestricted, SonarrError
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -69,6 +69,9 @@ async def async_setup_entry(hass: HomeAssistantType, entry: ConfigEntry) -> bool
 
     try:
         await sonarr.update()
+    except SonarrAccessRestricted:
+        _async_start_reauth(hass, entry)
+        return False
     except SonarrError as err:
         raise ConfigEntryNotReady from err
 
@@ -106,7 +109,18 @@ async def async_unload_entry(hass: HomeAssistantType, entry: ConfigEntry) -> boo
     return unload_ok
 
 
-async def _async_update_listener(hass: HomeAssistantType, entry: ConfigEntry) -> None:
+def _async_start_reauth(hass: HomeAssistant, entry: ConfigEntry):
+    hass.async_create_task(
+        hass.config_entries.flow.async_init(
+            DOMAIN,
+            context={"source": "reauth", "reauth_entry_id": entry.entry_id},
+            data=entry.data,
+        )
+    )
+    _LOGGER.error("API Key is no longer valid. Please reauthenticate")
+
+
+def _async_update_listener(hass: HomeAssistantType, entry: ConfigEntry) -> None:
     """Handle options update."""
     async_dispatcher_send(
         hass, f"sonarr.{entry.entry_id}.entry_options_update", entry.options
