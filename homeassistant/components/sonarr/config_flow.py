@@ -83,6 +83,7 @@ class SonarrConfigFlow(ConfigFlow, domain=DOMAIN):
         self, data: Optional[ConfigType] = None
     ) -> Dict[str, Any]:
         """Handle configuration by re-auth."""
+        # pylint: disable=no-member # https://github.com/PyCQA/pylint/issues/3167
         entry_id = self.context.get("reauth_entry_id")
 
         if not entry_id:
@@ -101,7 +102,7 @@ class SonarrConfigFlow(ConfigFlow, domain=DOMAIN):
         errors = {}
 
         if user_input is not None:
-            if self.reauth:
+            if self._reauth:
                 user_input = {**self._entry_data, **user_input}
 
             if CONF_VERIFY_SSL not in user_input:
@@ -128,9 +129,9 @@ class SonarrConfigFlow(ConfigFlow, domain=DOMAIN):
                             return self.async_abort(reason="reauth_successful")
 
                     return self.async_abort(reason="reauth_failure")
-                    
+     
                 return self.async_create_entry(title=user_input[CONF_HOST], data=user_input)
-        
+
         data_schema = self._get_user_data_schema()
         return self.async_show_form(
             step_id="user",
