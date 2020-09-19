@@ -1,6 +1,7 @@
 """The Sonarr component."""
 import asyncio
 from datetime import timedelta
+import logging
 from typing import Any, Dict
 
 from sonarr import Sonarr, SonarrAccessRestricted, SonarrError
@@ -36,6 +37,7 @@ from .const import (
 
 PLATFORMS = ["sensor"]
 SCAN_INTERVAL = timedelta(seconds=30)
+_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup(hass: HomeAssistantType, config: Dict) -> bool:
