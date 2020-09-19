@@ -128,7 +128,7 @@ async def test_full_reauth_flow_implementation(
     result = await hass.config_entries.flow.async_init(
          DOMAIN,
          context={CONF_SOURCE: "reauth", "reauth_entry_id": entry.entry_id},
-         data: entry.data,
+         data=entry.data,
     ) 
 
     assert result["type"] == RESULT_TYPE_FORM
