@@ -239,7 +239,9 @@ async def test_full_user_flow_advanced_options(
 
 async def test_options_flow(hass, aioclient_mock: AiohttpClientMocker):
     """Test updating options."""
-    entry = await setup_integration(hass, aioclient_mock, skip_entry_setup=True)
+    with patch("homeassistant.components.sonarr.PLATFORMS", []):
+        entry = await setup_integration(hass, aioclient_mock)
+
     assert entry.options[CONF_UPCOMING_DAYS] == DEFAULT_UPCOMING_DAYS
     assert entry.options[CONF_WANTED_MAX_ITEMS] == DEFAULT_WANTED_MAX_ITEMS
 
