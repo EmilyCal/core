@@ -121,7 +121,7 @@ class SonarrConfigFlow(ConfigFlow, domain=DOMAIN):
                 return self.async_abort(reason="unknown")
             else:
                 if self._reauth:
-                    return await self._async_update_entry(self.entry_id, user_input)
+                    return await self._async_update_entry(self._entry_id, user_input)
 
                 return self.async_create_entry(
                     title=user_input[CONF_HOST], data=user_input
