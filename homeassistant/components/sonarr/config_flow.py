@@ -5,12 +5,7 @@ from typing import Any, Dict, Optional
 from sonarr import Sonarr, SonarrAccessRestricted, SonarrError
 import voluptuous as vol
 
-from homeassistant.config_entries import (
-    CONN_CLASS_LOCAL_POLL,
-    ConfigFlow,
-    OptionsFlow,
-    UnknownEntry,
-)
+from homeassistant.config_entries import CONN_CLASS_LOCAL_POLL, ConfigFlow, OptionsFlow
 from homeassistant.const import (
     CONF_API_KEY,
     CONF_HOST,
@@ -89,11 +84,11 @@ class SonarrConfigFlow(ConfigFlow, domain=DOMAIN):
     ) -> Dict[str, Any]:
         """Handle configuration by re-auth."""
         entry_data = dict(data)
-        entry_id = entry_data.get("config_entry_id", Nkne)
+        entry_id = entry_data.get("config_entry_id")
 
         entry = self.hass.config_entries.async_get_entry(entry_id)
         if entry is None:
-            raise UnknownEntry(entry_id)
+            return self.async_abort(reason="reauth_failure")
 
         del entry_data["config_entry_id"]
         self._reauth = True
@@ -144,7 +139,7 @@ class SonarrConfigFlow(ConfigFlow, domain=DOMAIN):
         entry = self.hass.config_entries.async_get_entry(entry_id)
 
         if entry is None:
-            raise UnknownEntry(entry_id)
+            return self.async_abort(reason="reauth_failure")
 
         self.hass.config_entries.async_update_entry(entry, data=data)
 
