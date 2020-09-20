@@ -140,7 +140,7 @@ async def test_full_reauth_flow_implementation(
         DOMAIN,
         context={CONF_SOURCE: "reauth"},
         data={"config_entry_id": "fake-entry-id", **entry.data},
-    }
+    )
 
     assert result["type"] == RESULT_TYPE_FORM
     assert result["step_id"] == "reauth"
@@ -158,7 +158,7 @@ async def test_full_reauth_flow_implementation(
         DOMAIN,
         context={CONF_SOURCE: "reauth"},
         data={"config_entry_id": entry.entry_id, **entry.data},
-    ) 
+    )
 
     assert result["type"] == RESULT_TYPE_FORM
     assert result["step_id"] == "reauth"
@@ -171,7 +171,6 @@ async def test_full_reauth_flow_implementation(
 
     assert result["type"] == RESULT_TYPE_ABORT
     assert result["reason"] == "reauth_successful"
-
 
 async def test_full_user_flow_implementation(
     hass: HomeAssistantType, aioclient_mock: AiohttpClientMocker
