@@ -135,7 +135,7 @@ async def test_full_reauth_flow_implementation(
     assert result["type"] == RESULT_TYPE_ABORT
     assert result["reason"] == "reauth_failure"
 
-    # test failure 2 
+    # test failure 2
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
         context={CONF_SOURCE: "reauth"},
@@ -171,6 +171,7 @@ async def test_full_reauth_flow_implementation(
 
     assert result["type"] == RESULT_TYPE_ABORT
     assert result["reason"] == "reauth_successful"
+
 
 async def test_full_user_flow_implementation(
     hass: HomeAssistantType, aioclient_mock: AiohttpClientMocker
