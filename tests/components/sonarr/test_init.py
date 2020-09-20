@@ -25,8 +25,18 @@ async def test_config_entry_reauth(
     hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test the configuration entry not ready."""
-    entry = await setup_integration(hass, aioclient_mock, invalid_auth=True)
+    with patch.object(
+        hass.config_entries.flow, "async_init"
+    ) as mock_flow_init:
+        entry = await setup_integration(hass, aioclient_mock, invalid_auth=True)
+
     assert entry.state == ENTRY_STATE_SETUP_ERROR
+
+    mock_flow_init.assert_called_once_with(
+        DOMAIN,
+        context={"source": "reauth"},
+        data={"config_entry_id": entry.entry_id, **entry.data},
+    )
 
 
 async def test_unload_config_entry(
