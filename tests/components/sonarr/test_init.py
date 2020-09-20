@@ -3,6 +3,7 @@ from homeassistant.components.sonarr.const import DOMAIN
 from homeassistant.config_entries import (
     ENTRY_STATE_LOADED,
     ENTRY_STATE_NOT_LOADED,
+    ENTRY_STATE_SETUP_ERROR,
     ENTRY_STATE_SETUP_RETRY,
 )
 from homeassistant.core import HomeAssistant
@@ -18,6 +19,14 @@ async def test_config_entry_not_ready(
     """Test the configuration entry not ready."""
     entry = await setup_integration(hass, aioclient_mock, connection_error=True)
     assert entry.state == ENTRY_STATE_SETUP_RETRY
+
+
+async def test_config_entry_reauth(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+) -> None:
+    """Test the configuration entry not ready."""
+    entry = await setup_integration(hass, aioclient_mock, invalid_auth=True)
+    assert entry.state == ENTRY_STATE_SETUP_ERROR
 
 
 async def test_unload_config_entry(
