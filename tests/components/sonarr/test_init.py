@@ -24,7 +24,7 @@ async def test_config_entry_not_ready(
 async def test_config_entry_reauth(
     hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
 ) -> None:
-    """Test the configuration entry not ready."""
+    """Test the configuration entry needing to be re-authenticated."""
     with patch.object(
         hass.config_entries.flow, "async_init"
     ) as mock_flow_init:
