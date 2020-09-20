@@ -115,8 +115,8 @@ def _async_start_reauth(hass: HomeAssistantType, entry: ConfigEntry):
     hass.async_create_task(
         hass.config_entries.flow.async_init(
             DOMAIN,
-            context={"source": "reauth", "reauth_entry_id": entry.entry_id},
-            data=entry.data,
+            context={"source": "reauth"},
+            data={"config_entry_id": entry.entry_id, **entry.data},
         )
     )
     _LOGGER.error("API Key is no longer valid. Please reauthenticate")
