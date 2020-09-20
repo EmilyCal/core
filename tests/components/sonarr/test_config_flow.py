@@ -125,6 +125,35 @@ async def test_full_reauth_flow_implementation(
     entry = await setup_integration(hass, aioclient_mock, skip_entry_setup=True)
     assert entry
 
+    # test failure 1
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN,
+        context={CONF_SOURCE: "reauth"},
+        data=entry.data,
+    )
+
+    assert result["type"] == RESULT_TYPE_ABORT
+    assert result["reason"] == "reauth_failure"
+
+    # test failure 2 
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN,
+        context={CONF_SOURCE: "reauth"},
+        data={"config_entry_id": "fake-entry-id", **entry.data},
+    }
+
+    assert result["type"] == RESULT_TYPE_FORM
+    assert result["step_id"] == "reauth"
+
+    user_input = MOCK_REAUTH_INPUT.copy()
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], user_input=user_input
+    )
+
+    assert result["type"] == RESULT_TYPE_ABORT
+    assert result["reason"] == "reauth_failure"
+
+    # test successful
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
         context={CONF_SOURCE: "reauth"},
@@ -137,8 +166,7 @@ async def test_full_reauth_flow_implementation(
     user_input = MOCK_REAUTH_INPUT.copy()
     with _patch_async_setup(), _patch_async_setup_entry():
         result = await hass.config_entries.flow.async_configure(
-            result["flow_id"],
-            user_input=user_input,
+            result["flow_id"], user_input=user_input
         )
 
     assert result["type"] == RESULT_TYPE_ABORT
