@@ -134,7 +134,7 @@ class SonarrConfigFlow(ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    def _async_update_entry(entry_id: str, data: dict) -> Dict[str, Any]:
+    def _async_update_entry(self, entry_id: str, data: dict) -> Dict[str, Any]:
         """Update existing config entry."""
         entry = self.hass.config_entries.async_get_entry(entry_id)
 
