@@ -5,7 +5,12 @@ from typing import Any, Dict, Optional
 from sonarr import Sonarr, SonarrAccessRestricted, SonarrError
 import voluptuous as vol
 
-from homeassistant.config_entries import CONN_CLASS_LOCAL_POLL, ConfigFlow, OptionsFlow
+from homeassistant.config_entries import (
+    CONN_CLASS_LOCAL_POLL,
+    ConfigFlow,
+    OptionsFlow,
+    UnknownEntry,
+)
 from homeassistant.const import (
     CONF_API_KEY,
     CONF_HOST,
@@ -84,17 +89,18 @@ class SonarrConfigFlow(ConfigFlow, domain=DOMAIN):
     ) -> Dict[str, Any]:
         """Handle configuration by re-auth."""
         entry_data = dict(data)
-        entry_id = entry_data.get("config_entry_id")
+        entry_id = entry_data.get("config_entry_id", Nkne)
 
-        if entry_id:
-            del entry_data["config_entry_id"]
-            self._reauth = True
-            self._entry_id = entry_id
-            self._entry_data = entry_data
+        entry = self.hass.config_entries.async_get_entry(entry_id)
+        if entry is None:
+            raise UnknownEntry(entry_id)
 
-            return await self.async_step_user()
+        del entry_data["config_entry_id"]
+        self._reauth = True
+        self._entry_id = entry_id
+        self._entry_data = entry_data
 
-        return self.async_abort(reason="reauth_failure")
+        return await self.async_step_user()
 
     async def async_step_user(
         self, user_input: Optional[ConfigType] = None
@@ -120,16 +126,7 @@ class SonarrConfigFlow(ConfigFlow, domain=DOMAIN):
                 return self.async_abort(reason="unknown")
             else:
                 if self._reauth:
-                    for entry in self._async_current_entries():
-                        if entry.entry_id == self._entry_id:
-                            self.hass.config_entries.async_update_entry(
-                                entry, data=user_input
-                            )
-
-                            await self.hass.config_entries.async_reload(self._entry_id)
-                            return self.async_abort(reason="reauth_successful")
-
-                    return self.async_abort(reason="reauth_failure")
+                    return await self._async_update_entry(self.entry_id, user_input)
 
                 return self.async_create_entry(
                     title=user_input[CONF_HOST], data=user_input
@@ -141,6 +138,17 @@ class SonarrConfigFlow(ConfigFlow, domain=DOMAIN):
             data_schema=vol.Schema(data_schema),
             errors=errors,
         )
+
+    def _async_update_entry(entry_id: str, data: dict) -> Dict[str, Any]:
+        """Update existing config entry."""
+        entry = self.hass.config_entries.async_get_entry(entry_id)
+
+        if entry is None:
+            raise UnknownEntry(entry_id)
+
+        self.hass.config_entries.async_update_entry(entry, data=data)
+
+        return self.async_abort(reason="reauth_successful")
 
     def _get_user_data_schema(self) -> Dict[str, Any]:
         """Get the data schema to display user form."""
