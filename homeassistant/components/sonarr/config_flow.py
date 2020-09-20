@@ -134,7 +134,7 @@ class SonarrConfigFlow(ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    def _async_update_entry(self, entry_id: str, data: dict) -> Dict[str, Any]:
+    async def _async_update_entry(self, entry_id: str, data: dict) -> Dict[str, Any]:
         """Update existing config entry."""
         entry = self.hass.config_entries.async_get_entry(entry_id)
 
@@ -142,6 +142,7 @@ class SonarrConfigFlow(ConfigFlow, domain=DOMAIN):
             return self.async_abort(reason="reauth_failure")
 
         self.hass.config_entries.async_update_entry(entry, data=data)
+        await self.hass.config_entries.async_reload(entry.entry_id)
 
         return self.async_abort(reason="reauth_successful")
 
