@@ -94,7 +94,7 @@ class SonarrConfigFlow(ConfigFlow, domain=DOMAIN):
 
             return self.async_step_user()
 
-        return self.async_abort(reason="reauth_failure")
+        return await self.async_abort(reason="reauth_failure")
 
     async def async_step_user(
         self, user_input: Optional[ConfigType] = None
